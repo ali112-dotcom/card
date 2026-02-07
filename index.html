@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Al-A'raf Mission - Contact</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* --- 1. SETUP & ANIMATED BACKGROUND --- */
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            font-family: 'Lato', sans-serif;
+            background: #0f2027; /* Fallback */
+            background: linear-gradient(to right, #2c5364, #203a43, #0f2027); /* Dark Deep Ocean */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            overflow: hidden;
+            perspective: 1000px; /* Essential for 3D effect */
+        }
+
+        /* Floating Particles in Background */
+        .bg-particle {
+            position: absolute;
+            background: rgba(255,255,255,0.05);
+            border-radius: 50%;
+            animation: floatUp 10s infinite linear;
+            z-index: 0;
+        }
+
+        /* --- 2. THE 3D CARD CONTAINER --- */
+        .card-container {
+            width: 100%;
+            max-width: 400px;
+            transform-style: preserve-3d;
+            transition: transform 0.1s; /* Smooth movement */
+        }
+
+        .card {
+            /* Moving Silver Gradient */
+            background: linear-gradient(135deg, #eef2f3 0%, #8e9eab 50%, #eef2f3 100%);
+            background-size: 200% 200%;
+            animation: silverShine 6s ease infinite;
+            
+            border-radius: 25px;
+            padding: 40px 30px;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5), 
+                        inset 0 0 0 1px rgba(255,255,255,0.5);
+            
+            /* Glassmorphism feel */
+            backdrop-filter: blur(5px);
+            z-index: 1;
+            overflow: hidden; 
+        }
+
+        /* --- 3. ANIMATIONS --- */
+        
+        /* Shifting Silver Background */
+        @keyframes silverShine {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Floating Particles */
+        @keyframes floatUp {
+            0% { transform: translateY(100vh) scale(0); opacity: 0; }
+            50% { opacity: 1; }
+            100% { transform: translateY(-100px) scale(1); opacity: 0; }
+        }
+
+        /* Entrance Animation (Cascading) */
+        @keyframes slideUpFade {
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* Pulse for Logo */
+        @keyframes pulseGlow {
+            0% { box-shadow: 0 0 0 0 rgba(44, 62, 80, 0.2); }
+            70% { box-shadow: 0 0 0 15px rgba(44, 62, 80, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(44, 62, 80, 0); }
+        }
+
+        /* --- 4. CONTENT STYLING --- */
+        
+        .logo-placeholder {
+            width: 90px;
+            height: 90px;
+            background: #2c3e50;
+            color: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 32px;
+            border: 4px solid #fff;
+            animation: pulseGlow 2s infinite; /* Attention grabber */
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Staggered Entrance Classes */
+        .animate-in {
+            opacity: 0;
+            animation: slideUpFade 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+        }
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+        .delay-3 { animation-delay: 0.3s; }
+        .delay-4 { animation-delay: 0.4s; }
+
+        h1 {
+            font-family: 'Playfair Display', serif;
+            color: #2c3e50;
+            font-size: 28px;
+            margin-bottom: 5px;
+            text-shadow: 1px 1px 0px rgba(255,255,255,0.8);
+        }
+
+        p.designation {
+            color: #555;
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 30px;
+        }
+
+        /* --- 5. INTERACTIVE BUTTONS --- */
+        .btn-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            position: relative;
+            z-index: 5;
+        }
+
+        .btn {
+            position: relative;
+            overflow: hidden; /* For Ripple Effect */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 18px;
+            text-decoration: none;
+            border-radius: 15px;
+            font-weight: 700;
+            font-size: 16px;
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+        }
+
+        .btn:active {
+            transform: scale(0.95);
+        }
+
+        .btn i { margin-right: 12px; font-size: 20px; pointer-events: none;}
+        .btn span { pointer-events: none; }
+
+        /* Colors */
+        .btn-call { background: #2c3e50; color: #fff; }
+        .btn-whatsapp { 
+            background: linear-gradient(45deg, #25D366, #128C7E); 
+            color: white; 
+        }
+        .btn-website { 
+            background: linear-gradient(to right, #c0392b, #8e44ad); 
+            color: white; 
+        }
+
+        /* Ripple Animation Span */
+        span.ripple {
+            position: absolute;
+            border-radius: 50%;
+            transform: scale(0);
+            animation: ripple 0.6s linear;
+            background-color: rgba(255, 255, 255, 0.4);
+            pointer-events: none; 
+        }
+
+        @keyframes ripple {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+
+        .footer {
+            margin-top: 25px;
+            font-size: 11px;
+            color: #666;
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bg-particle" style="width: 20px; height: 20px; left: 10%; animation-duration: 8s;"></div>
+    <div class="bg-particle" style="width: 30px; height: 30px; left: 80%; animation-duration: 12s;"></div>
+    <div class="bg-particle" style="width: 15px; height: 15px; left: 40%; animation-duration: 15s;"></div>
+
+    <div class="card-container" id="cardContainer">
+        <div class="card">
+            
+            <div class="logo-placeholder animate-in">
+                <i class="fa-solid fa-graduation-cap"></i>
+            </div>
+
+            <div class="animate-in delay-1">
+                <h1>Al-A'raf Mission</h1>
+                <p class="designation">Executive & Admissions</p>
+            </div>
+
+            <div class="btn-container">
+                <a href="tel:+919547759837" class="btn btn-call animate-in delay-2">
+                    <i class="fa-solid fa-phone"></i> <span>Call Executive</span>
+                </a>
+
+                <a href="https://wa.me/919547759837?text=I'm%20looking%20for%20a%20quality%20hostel%20send%20details" class="btn btn-whatsapp animate-in delay-3" target="_blank">
+                    <i class="fa-brands fa-whatsapp"></i> <span>Chat on WhatsApp</span>
+                </a>
+
+                <a href="#" class="btn btn-website animate-in delay-4" target="_blank">
+                    <i class="fa-solid fa-globe"></i> <span>Visit Website</span>
+                </a>
+            </div>
+
+            <div class="footer animate-in delay-4">
+                &copy; 2026 Al-A'raf Mission. Excellence in Education.
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. RIPPLE EFFECT ON CLICK ---
+        const buttons = document.querySelectorAll('.btn');
+
+        buttons.forEach(btn => {
+            btn.addEventListener('click', function (e) {
+                // Don't block the link, just show effect
+                
+                let x = e.clientX - e.target.getBoundingClientRect().left;
+                let y = e.clientY - e.target.getBoundingClientRect().top;
+
+                let ripples = document.createElement('span');
+                ripples.classList.add('ripple');
+                ripples.style.left = x + 'px';
+                ripples.style.top = y + 'px';
+                
+                this.appendChild(ripples);
+
+                setTimeout(() => {
+                    ripples.remove()
+                }, 600);
+            })
+        });
+
+        // --- 2. 3D TILT EFFECT ---
+        const container = document.getElementById('cardContainer');
+        const card = document.querySelector('.card');
+
+        // Mouse Move (Desktop)
+        document.addEventListener('mousemove', (e) => {
+            rotateCard(e.clientX, e.clientY);
+        });
+
+        // Touch Move (Mobile)
+        document.addEventListener('touchmove', (e) => {
+            rotateCard(e.touches[0].clientX, e.touches[0].clientY);
+        });
+
+        function rotateCard(x, y) {
+            let innerWidth = window.innerWidth;
+            let innerHeight = window.innerHeight;
+
+            // Calculate rotation between -10 and 10 degrees
+            let xAxis = (innerWidth / 2 - x) / 20; 
+            let yAxis = (innerHeight / 2 - y) / 20; 
+
+            // Limit the rotation so it doesn't flip over
+            if(xAxis > 10) xAxis = 10;
+            if(xAxis < -10) xAxis = -10;
+            if(yAxis > 10) yAxis = 10;
+            if(yAxis < -10) yAxis = -10;
+
+            container.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
+        }
+
+        // Reset when mouse leaves (optional, keeps it alive if removed)
+        document.addEventListener('mouseleave', () => {
+            container.style.transform = `rotateY(0deg) rotateX(0deg)`;
+        });
+    </script>
+</body>
+</html>

@@ -31,7 +31,7 @@
         .scene {
             width: 90%;
             max-width: 360px;
-            height: 520px; /* Fixed height for flip consistency */
+            height: 520px;
             position: relative;
             z-index: 10;
             cursor: grab;
@@ -44,12 +44,14 @@
             height: 100%;
             position: relative;
             transform-style: preserve-3d;
-            transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1);
+            /* Transition set to none by default to allow physics engine to work */
+            transition: none; 
         }
 
         /* Flip State */
         .card-wrapper.is-flipped {
-            transform: rotateY(180deg) !important; /* Overrides physics for the flip action */
+            transform: rotateY(180deg) !important;
+            transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1) !important;
         }
 
         /* --- FRONT & BACK FACES --- */
@@ -57,7 +59,7 @@
             position: absolute;
             width: 100%;
             height: 100%;
-            backface-visibility: hidden; /* Hides the back when facing away */
+            backface-visibility: hidden;
             border-radius: 20px;
             padding: 30px 25px;
             background: rgba(202, 224, 226, 0.85);
@@ -70,14 +72,12 @@
             align-items: center;
         }
 
-        .face-front {
-            z-index: 2;
-        }
+        .face-front { z-index: 2; }
 
         .face-back {
-            transform: rotateY(180deg); /* Pre-rotated */
+            transform: rotateY(180deg);
             justify-content: center;
-            background: linear-gradient(135deg, #1a2a3a 0%, #2c3e50 100%); /* Dark theme for back */
+            background: linear-gradient(135deg, #1a2a3a 0%, #2c3e50 100%);
             color: white;
         }
 
@@ -266,13 +266,20 @@
         let currentX = 0, currentY = 0;
         let velX = 0, velY = 0;
 
+        // Auto-Spin Variables
+        let isAutoSpinning = false;
+        let spinStartTime = 0;
+        let spinStartAngle = 0;
+        const spinDuration = 2500; // 2.5 seconds for 2 spins
+
         // --- 1. FLIP LOGIC ---
         function toggleFlip(e) {
-            e.stopPropagation(); // Prevent drag from starting
+            e.stopPropagation();
             isFlipped = !isFlipped;
             if(isFlipped) {
                 cardWrapper.classList.add('is-flipped');
-                // Reset physics rotation when flipped to keep it straight
+                isAutoSpinning = false; // Stop spinning if we flip
+                // Reset physics for clean state
                 currentX = 0; currentY = 0; velX = 0; velY = 0;
                 cardWrapper.style.transform = `rotateY(180deg)`; 
             } else {
@@ -284,82 +291,124 @@
         flipBtn.addEventListener('click', toggleFlip);
         returnBtn.addEventListener('click', toggleFlip);
 
-        // --- 2. HAPTICS HELPER ---
+        // --- 2. HAPTICS ---
         function vibrate() {
             if (navigator.vibrate) navigator.vibrate(15);
         }
 
-        // --- 3. DYNAMIC GLARE LOGIC ---
-        // Calculates where the mouse is relative to the card center
+        // --- 3. AUTO SPIN LOGIC ---
+        function easeInOutCubic(t) {
+            return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+        }
+
+        function triggerSpin() {
+            // Don't spin if user is interacting, or if card is flipped to back
+            if (isDragging || isFlipped) return;
+
+            isAutoSpinning = true;
+            spinStartTime = performance.now();
+            spinStartAngle = currentX; // Start from wherever the card currently is
+            
+            // Kill existing momentum so it doesn't drift after spin
+            velX = 0; 
+            velY = 0;
+        }
+
+        // --- 4. GLARE & INPUT HANDLING ---
         function updateGlare(x, y) {
             const rect = scene.getBoundingClientRect();
-            const centerX = rect.left + rect.width / 2;
-            const centerY = rect.top + rect.height / 2;
-            
-            // Calculate percentage position (0% to 100%)
             const percentX = ((x - rect.left) / rect.width) * 100;
             const percentY = ((y - rect.top) / rect.height) * 100;
-
             glare.style.setProperty('--mouse-x', `${percentX}%`);
             glare.style.setProperty('--mouse-y', `${percentY}%`);
         }
 
-        document.addEventListener('mousemove', (e) => updateGlare(e.clientX, e.clientY));
-        document.addEventListener('touchmove', (e) => updateGlare(e.touches[0].clientX, e.touches[0].clientY));
-
-
-        // --- 4. PHYSICS SPIN LOGIC (Only works when NOT flipped) ---
         function handleStart(x, y) {
-            if(isFlipped) return; // Disable spin if looking at back
+            if(isFlipped) return;
             isDragging = true;
+            isAutoSpinning = false; // User touch cancels auto spin
             startX = x; startY = y;
             scene.style.cursor = "grabbing";
-            cardWrapper.style.transition = 'none'; // Disable transition for instant drag response
         }
 
         function handleMove(x, y) {
             if (!isDragging || isFlipped) return;
             const deltaX = x - startX;
             const deltaY = y - startY;
+            
             currentX += deltaX * 0.4;
             currentY -= deltaY * 0.4;
+            
             velX = deltaX * 0.4;
             velY = -(deltaY * 0.4);
+            
             startX = x; startY = y;
-            updateGlare(x, y); // Update glare while dragging
+            updateGlare(x, y);
         }
 
         function handleEnd() {
             isDragging = false;
             scene.style.cursor = "grab";
-            // Re-enable smooth transition for the momentum stop
-            cardWrapper.style.transition = 'transform 0.1s linear'; 
         }
 
+        // Events
         scene.addEventListener('mousedown', e => handleStart(e.clientX, e.clientY));
-        document.addEventListener('mousemove', e => handleMove(e.clientX, e.clientY));
+        document.addEventListener('mousemove', e => {
+            updateGlare(e.clientX, e.clientY);
+            handleMove(e.clientX, e.clientY);
+        });
         document.addEventListener('mouseup', handleEnd);
 
         scene.addEventListener('touchstart', e => handleStart(e.touches[0].clientX, e.touches[0].clientY));
         document.addEventListener('touchmove', e => handleMove(e.touches[0].clientX, e.touches[0].clientY));
         document.addEventListener('touchend', handleEnd);
 
-        // --- 5. ANIMATION LOOP ---
-        function animate() {
+        // --- 5. MAIN ANIMATION LOOP ---
+        function animate(time) {
             if (!isFlipped) {
-                if (!isDragging) {
+                
+                // Mode A: Auto Spinning
+                if (isAutoSpinning) {
+                    const elapsed = time - spinStartTime;
+                    const progress = Math.min(elapsed / spinDuration, 1);
+                    const ease = easeInOutCubic(progress);
+
+                    // 720 degrees = 2 full rotations
+                    currentX = spinStartAngle + (720 * ease);
+                    
+                    // Decay Y axis tilt back to 0 for a cleaner spin
+                    currentY = currentY * (1 - ease); 
+
+                    if (progress >= 1) {
+                        isAutoSpinning = false;
+                        // Ensure we land on a clean number to prevent float jitter
+                        currentX = currentX % 360; 
+                    }
+                } 
+                // Mode B: Physics/Momentum
+                else if (!isDragging) {
                     currentX += velX;
                     currentY += velY;
                     velX *= 0.95; // Friction
                     velY *= 0.95;
                 }
-                // Apply rotation
-                // Note: We don't apply if isFlipped because CSS class handles that
+
+                // Apply Transform
                 cardWrapper.style.transform = `rotateY(${currentX}deg) rotateX(${currentY}deg)`;
             }
             requestAnimationFrame(animate);
         }
-        animate();
+        
+        // Start Loop
+        requestAnimationFrame(animate);
+
+        // --- 6. TIMERS ---
+        // Load initial spin after 500ms
+        window.addEventListener('load', () => {
+            setTimeout(triggerSpin, 500);
+            // Repeat every 10 seconds
+            setInterval(triggerSpin, 10000);
+        });
 
     </script>
 </body>

@@ -2,308 +2,365 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Al-A'raf Mission - Contact</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Al-A'raf Mission - Premium Contact</title>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        /* --- 1. SETUP & ANIMATED BACKGROUND --- */
-        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+        :root {
+            --primary-navy: #1a2a3a;
+            --accent-gold: #d4af37;
+            --glass-border: rgba(255, 255, 255, 0.6);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; user-select: none; }
 
         body {
             font-family: 'Lato', sans-serif;
-            background: #0f2027; /* Fallback */
-            background: linear-gradient(to right, #2c5364, #203a43, #0f2027); /* Dark Deep Ocean */
+            background: radial-gradient(circle at center, #b8c5c5, #ffffff);
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            padding: 20px;
             overflow: hidden;
-            perspective: 1000px; /* Essential for 3D effect */
+            perspective: 1200px;
         }
 
-        /* Floating Particles in Background */
-        .bg-particle {
-            position: absolute;
-            background: rgba(255,255,255,0.05);
-            border-radius: 50%;
-            animation: floatUp 10s infinite linear;
-            z-index: 0;
+        /* --- THE CARD CONTAINER --- */
+        .scene {
+            width: 90%;
+            max-width: 360px;
+            height: 520px; /* Fixed height for flip consistency */
+            position: relative;
+            z-index: 10;
+            cursor: grab;
         }
+        .scene:active { cursor: grabbing; }
 
-        /* --- 2. THE 3D CARD CONTAINER --- */
-        .card-container {
+        /* The Moving Object */
+        .card-wrapper {
             width: 100%;
-            max-width: 400px;
+            height: 100%;
+            position: relative;
             transform-style: preserve-3d;
-            transition: transform 0.1s; /* Smooth movement */
+            transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1);
         }
 
-        .card {
-            /* Moving Silver Gradient */
-            background: linear-gradient(135deg, #eef2f3 0%, #8e9eab 50%, #eef2f3 100%);
-            background-size: 200% 200%;
-            animation: silverShine 6s ease infinite;
-            
-            border-radius: 25px;
-            padding: 40px 30px;
-            text-align: center;
-            position: relative;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5), 
-                        inset 0 0 0 1px rgba(255,255,255,0.5);
-            
-            /* Glassmorphism feel */
-            backdrop-filter: blur(5px);
-            z-index: 1;
-            overflow: hidden; 
+        /* Flip State */
+        .card-wrapper.is-flipped {
+            transform: rotateY(180deg) !important; /* Overrides physics for the flip action */
         }
 
-        /* --- 3. ANIMATIONS --- */
-        
-        /* Shifting Silver Background */
-        @keyframes silverShine {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        /* Floating Particles */
-        @keyframes floatUp {
-            0% { transform: translateY(100vh) scale(0); opacity: 0; }
-            50% { opacity: 1; }
-            100% { transform: translateY(-100px) scale(1); opacity: 0; }
-        }
-
-        /* Entrance Animation (Cascading) */
-        @keyframes slideUpFade {
-            from { transform: translateY(30px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-
-        /* Pulse for Logo */
-        @keyframes pulseGlow {
-            0% { box-shadow: 0 0 0 0 rgba(44, 62, 80, 0.2); }
-            70% { box-shadow: 0 0 0 15px rgba(44, 62, 80, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(44, 62, 80, 0); }
-        }
-
-        /* --- 4. CONTENT STYLING --- */
-        
-        .logo-placeholder {
-            width: 90px;
-            height: 90px;
-            background: #2c3e50;
-            color: #fff;
-            border-radius: 50%;
+        /* --- FRONT & BACK FACES --- */
+        .face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden; /* Hides the back when facing away */
+            border-radius: 20px;
+            padding: 30px 25px;
+            background: rgba(202, 224, 226, 0.85);
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             display: flex;
+            flex-direction: column;
             align-items: center;
-            justify-content: center;
-            margin: 0 auto 20px;
-            font-size: 32px;
-            border: 4px solid #fff;
-            animation: pulseGlow 2s infinite; /* Attention grabber */
-            position: relative;
+        }
+
+        .face-front {
             z-index: 2;
         }
 
-        /* Staggered Entrance Classes */
-        .animate-in {
-            opacity: 0;
-            animation: slideUpFade 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+        .face-back {
+            transform: rotateY(180deg); /* Pre-rotated */
+            justify-content: center;
+            background: linear-gradient(135deg, #1a2a3a 0%, #2c3e50 100%); /* Dark theme for back */
+            color: white;
         }
-        .delay-1 { animation-delay: 0.1s; }
-        .delay-2 { animation-delay: 0.2s; }
-        .delay-3 { animation-delay: 0.3s; }
-        .delay-4 { animation-delay: 0.4s; }
+
+        /* --- DYNAMIC GLARE LAYER --- */
+        .glare {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            border-radius: 20px;
+            background: radial-gradient(
+                circle at var(--mouse-x, 50%) var(--mouse-y, 50%), 
+                rgba(255,255,255,0.7) 0%, 
+                rgba(255,255,255,0) 50%
+            );
+            opacity: 0.6;
+            pointer-events: none;
+            mix-blend-mode: overlay;
+            z-index: 10;
+        }
+
+        /* --- CONTENT STYLING --- */
+        .logo-box {
+            width: 70px; height: 70px;
+            background: var(--primary-navy);
+            color: var(--accent-gold);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 28px;
+            border: 3px solid #fff;
+            margin-bottom: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+            transform: translateZ(20px);
+        }
 
         h1 {
             font-family: 'Playfair Display', serif;
-            color: #2c3e50;
-            font-size: 28px;
+            color: var(--primary-navy);
+            font-size: 24px;
             margin-bottom: 5px;
-            text-shadow: 1px 1px 0px rgba(255,255,255,0.8);
+            transform: translateZ(15px);
         }
 
-        p.designation {
+        p.desc {
             color: #555;
-            font-size: 14px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-bottom: 30px;
+            font-size: 12px;
+            text-align: center;
+            margin-bottom: 20px;
+            font-weight: 600;
+            transform: translateZ(15px);
         }
 
-        /* --- 5. INTERACTIVE BUTTONS --- */
+        /* Buttons */
         .btn-container {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            position: relative;
-            z-index: 5;
+            width: 100%;
+            display: flex; flex-direction: column; gap: 10px;
+            transform: translateZ(30px);
         }
 
         .btn {
-            position: relative;
-            overflow: hidden; /* For Ripple Effect */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 18px;
+            display: flex; align-items: center; justify-content: center;
+            padding: 12px;
             text-decoration: none;
-            border-radius: 15px;
-            font-weight: 700;
-            font-size: 16px;
-            transition: transform 0.2s, box-shadow 0.2s;
+            border-radius: 10px;
+            font-weight: 700; font-size: 14px;
+            color: white;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.1s;
+        }
+        .btn:active { transform: scale(0.95); }
+
+        .btn-exec { background: #2980b9; }
+        .btn-admin { background: #16a085; }
+        .btn-wa { background: #25d366; }
+        .btn-flip { 
+            background: transparent; 
+            border: 2px solid var(--primary-navy); 
+            color: var(--primary-navy); 
+            margin-top: 5px;
+        }
+
+        /* Back Side Styling */
+        .qr-placeholder {
+            width: 150px; height: 150px;
+            background: white;
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            transform: translateZ(30px);
+        }
+        .qr-placeholder img { width: 100%; height: 100%; }
+        
+        .back-title { font-size: 20px; margin-bottom: 20px; color: var(--accent-gold); transform: translateZ(20px);}
+        
+        .btn-back-action {
+            width: 80%;
+            padding: 12px;
+            background: var(--accent-gold);
+            color: var(--primary-navy);
+            border-radius: 25px;
+            text-align: center;
+            text-decoration: none;
+            font-weight: bold;
+            margin-bottom: 15px;
+            transform: translateZ(30px);
+        }
+        .btn-return {
+            color: rgba(255,255,255,0.6);
             cursor: pointer;
+            margin-top: 20px;
+            font-size: 24px;
         }
 
-        .btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
-        }
+        /* Particles Background */
+        .particles { position: absolute; top:0; left:0; width:100%; height:100%; pointer-events: none; z-index: 0; }
+        .particle { position: absolute; background: rgba(0,0,0,0.03); border-radius: 50%; animation: float 20s infinite linear; }
+        @keyframes float { 0% { transform: translateY(100vh); } 100% { transform: translateY(-100px); } }
 
-        .btn:active {
-            transform: scale(0.95);
-        }
-
-        .btn i { margin-right: 12px; font-size: 20px; pointer-events: none;}
-        .btn span { pointer-events: none; }
-
-        /* Colors */
-        .btn-call { background: #2c3e50; color: #fff; }
-        .btn-whatsapp { 
-            background: linear-gradient(45deg, #25D366, #128C7E); 
-            color: white; 
-        }
-        .btn-website { 
-            background: linear-gradient(to right, #c0392b, #8e44ad); 
-            color: white; 
-        }
-
-        /* Ripple Animation Span */
-        span.ripple {
-            position: absolute;
-            border-radius: 50%;
-            transform: scale(0);
-            animation: ripple 0.6s linear;
-            background-color: rgba(255, 255, 255, 0.4);
-            pointer-events: none; 
-        }
-
-        @keyframes ripple {
-            to {
-                transform: scale(4);
-                opacity: 0;
-            }
-        }
-
-        .footer {
-            margin-top: 25px;
-            font-size: 11px;
-            color: #666;
-            opacity: 0.7;
-        }
     </style>
 </head>
 <body>
 
-    <div class="bg-particle" style="width: 20px; height: 20px; left: 10%; animation-duration: 8s;"></div>
-    <div class="bg-particle" style="width: 30px; height: 30px; left: 80%; animation-duration: 12s;"></div>
-    <div class="bg-particle" style="width: 15px; height: 15px; left: 40%; animation-duration: 15s;"></div>
+    <div class="particles">
+        <div class="particle" style="width: 50px; height: 50px; left: 10%; animation-duration: 25s;"></div>
+        <div class="particle" style="width: 30px; height: 30px; left: 80%; animation-duration: 18s;"></div>
+    </div>
 
-    <div class="card-container" id="cardContainer">
-        <div class="card">
+    <div class="scene" id="scene">
+        <div class="card-wrapper" id="cardWrapper">
             
-            <div class="logo-placeholder animate-in">
-                <i class="fa-solid fa-graduation-cap"></i>
-            </div>
+            <div class="face face-front">
+                <div class="glare" id="glare"></div>
 
-            <div class="animate-in delay-1">
+                <div class="logo-box">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                </div>
+
                 <h1>Al-A'raf Mission</h1>
-                <p class="designation">Executive & Admissions</p>
+                <p class="desc">Excellence in Residential Education</p>
+
+                <div class="btn-container">
+                    <a href="tel:+919735664089" class="btn btn-exec" onclick="vibrate()">
+                        <i class="fa-solid fa-phone" style="margin-right:8px;"></i> Executive
+                    </a>
+                    <a href="tel:+919547759837" class="btn btn-admin" onclick="vibrate()">
+                        <i class="fa-solid fa-user-tie" style="margin-right:8px;"></i> Admin
+                    </a>
+                    <a href="https://wa.me/919547759837" class="btn btn-wa" onclick="vibrate()">
+                        <i class="fa-brands fa-whatsapp" style="margin-right:8px;"></i> WhatsApp
+                    </a>
+                    
+                    <button class="btn btn-flip" id="flipBtn" onclick="vibrate()">
+                        <i class="fa-solid fa-qrcode" style="margin-right:8px;"></i> Scan & Map
+                    </button>
+                </div>
             </div>
 
-            <div class="btn-container">
-                <a href="tel:+919547759837" class="btn btn-call animate-in delay-2">
-                    <i class="fa-solid fa-phone"></i> <span>Call Executive</span>
+            <div class="face face-back">
+                <h2 class="back-title">Scan to Save</h2>
+                
+                <div class="qr-placeholder">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=BEGIN%3AVCARD%0AVERSION%3A3.0%0AN%3AMission%3BAl-Araf%0ATEL%3A9547759837%0AEND%3AVCARD" alt="QR Code">
+                </div>
+
+                <a href="https://maps.google.com/?q=Al-Araf+Mission" target="_blank" class="btn-back-action" onclick="vibrate()">
+                    <i class="fa-solid fa-location-dot"></i> Locate on Map
                 </a>
 
-                <a href="https://wa.me/919547759837?text=I'm%20looking%20for%20a%20quality%20hostel%20send%20details" class="btn btn-whatsapp animate-in delay-3" target="_blank">
-                    <i class="fa-brands fa-whatsapp"></i> <span>Chat on WhatsApp</span>
-                </a>
-
-                <a href="#" class="btn btn-website animate-in delay-4" target="_blank">
-                    <i class="fa-solid fa-globe"></i> <span>Visit Website</span>
-                </a>
+                <div class="btn-return" id="returnBtn" onclick="vibrate()">
+                    <i class="fa-solid fa-rotate-left"></i>
+                </div>
             </div>
 
-            <div class="footer animate-in delay-4">
-                &copy; 2026 Al-A'raf Mission. Excellence in Education.
-            </div>
         </div>
     </div>
 
     <script>
-        // --- 1. RIPPLE EFFECT ON CLICK ---
-        const buttons = document.querySelectorAll('.btn');
+        // --- VARIABLES ---
+        const scene = document.getElementById('scene');
+        const cardWrapper = document.getElementById('cardWrapper');
+        const glare = document.getElementById('glare');
+        const flipBtn = document.getElementById('flipBtn');
+        const returnBtn = document.getElementById('returnBtn');
 
-        buttons.forEach(btn => {
-            btn.addEventListener('click', function (e) {
-                // Don't block the link, just show effect
-                
-                let x = e.clientX - e.target.getBoundingClientRect().left;
-                let y = e.clientY - e.target.getBoundingClientRect().top;
+        let isFlipped = false;
+        let isDragging = false;
+        let startX, startY;
+        let currentX = 0, currentY = 0;
+        let velX = 0, velY = 0;
 
-                let ripples = document.createElement('span');
-                ripples.classList.add('ripple');
-                ripples.style.left = x + 'px';
-                ripples.style.top = y + 'px';
-                
-                this.appendChild(ripples);
-
-                setTimeout(() => {
-                    ripples.remove()
-                }, 600);
-            })
-        });
-
-        // --- 2. 3D TILT EFFECT ---
-        const container = document.getElementById('cardContainer');
-        const card = document.querySelector('.card');
-
-        // Mouse Move (Desktop)
-        document.addEventListener('mousemove', (e) => {
-            rotateCard(e.clientX, e.clientY);
-        });
-
-        // Touch Move (Mobile)
-        document.addEventListener('touchmove', (e) => {
-            rotateCard(e.touches[0].clientX, e.touches[0].clientY);
-        });
-
-        function rotateCard(x, y) {
-            let innerWidth = window.innerWidth;
-            let innerHeight = window.innerHeight;
-
-            // Calculate rotation between -10 and 10 degrees
-            let xAxis = (innerWidth / 2 - x) / 20; 
-            let yAxis = (innerHeight / 2 - y) / 20; 
-
-            // Limit the rotation so it doesn't flip over
-            if(xAxis > 10) xAxis = 10;
-            if(xAxis < -10) xAxis = -10;
-            if(yAxis > 10) yAxis = 10;
-            if(yAxis < -10) yAxis = -10;
-
-            container.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
+        // --- 1. FLIP LOGIC ---
+        function toggleFlip(e) {
+            e.stopPropagation(); // Prevent drag from starting
+            isFlipped = !isFlipped;
+            if(isFlipped) {
+                cardWrapper.classList.add('is-flipped');
+                // Reset physics rotation when flipped to keep it straight
+                currentX = 0; currentY = 0; velX = 0; velY = 0;
+                cardWrapper.style.transform = `rotateY(180deg)`; 
+            } else {
+                cardWrapper.classList.remove('is-flipped');
+                cardWrapper.style.transform = `rotateY(0deg)`;
+            }
         }
 
-        // Reset when mouse leaves (optional, keeps it alive if removed)
-        document.addEventListener('mouseleave', () => {
-            container.style.transform = `rotateY(0deg) rotateX(0deg)`;
-        });
+        flipBtn.addEventListener('click', toggleFlip);
+        returnBtn.addEventListener('click', toggleFlip);
+
+        // --- 2. HAPTICS HELPER ---
+        function vibrate() {
+            if (navigator.vibrate) navigator.vibrate(15);
+        }
+
+        // --- 3. DYNAMIC GLARE LOGIC ---
+        // Calculates where the mouse is relative to the card center
+        function updateGlare(x, y) {
+            const rect = scene.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+            
+            // Calculate percentage position (0% to 100%)
+            const percentX = ((x - rect.left) / rect.width) * 100;
+            const percentY = ((y - rect.top) / rect.height) * 100;
+
+            glare.style.setProperty('--mouse-x', `${percentX}%`);
+            glare.style.setProperty('--mouse-y', `${percentY}%`);
+        }
+
+        document.addEventListener('mousemove', (e) => updateGlare(e.clientX, e.clientY));
+        document.addEventListener('touchmove', (e) => updateGlare(e.touches[0].clientX, e.touches[0].clientY));
+
+
+        // --- 4. PHYSICS SPIN LOGIC (Only works when NOT flipped) ---
+        function handleStart(x, y) {
+            if(isFlipped) return; // Disable spin if looking at back
+            isDragging = true;
+            startX = x; startY = y;
+            scene.style.cursor = "grabbing";
+            cardWrapper.style.transition = 'none'; // Disable transition for instant drag response
+        }
+
+        function handleMove(x, y) {
+            if (!isDragging || isFlipped) return;
+            const deltaX = x - startX;
+            const deltaY = y - startY;
+            currentX += deltaX * 0.4;
+            currentY -= deltaY * 0.4;
+            velX = deltaX * 0.4;
+            velY = -(deltaY * 0.4);
+            startX = x; startY = y;
+            updateGlare(x, y); // Update glare while dragging
+        }
+
+        function handleEnd() {
+            isDragging = false;
+            scene.style.cursor = "grab";
+            // Re-enable smooth transition for the momentum stop
+            cardWrapper.style.transition = 'transform 0.1s linear'; 
+        }
+
+        scene.addEventListener('mousedown', e => handleStart(e.clientX, e.clientY));
+        document.addEventListener('mousemove', e => handleMove(e.clientX, e.clientY));
+        document.addEventListener('mouseup', handleEnd);
+
+        scene.addEventListener('touchstart', e => handleStart(e.touches[0].clientX, e.touches[0].clientY));
+        document.addEventListener('touchmove', e => handleMove(e.touches[0].clientX, e.touches[0].clientY));
+        document.addEventListener('touchend', handleEnd);
+
+        // --- 5. ANIMATION LOOP ---
+        function animate() {
+            if (!isFlipped) {
+                if (!isDragging) {
+                    currentX += velX;
+                    currentY += velY;
+                    velX *= 0.95; // Friction
+                    velY *= 0.95;
+                }
+                // Apply rotation
+                // Note: We don't apply if isFlipped because CSS class handles that
+                cardWrapper.style.transform = `rotateY(${currentX}deg) rotateX(${currentY}deg)`;
+            }
+            requestAnimationFrame(animate);
+        }
+        animate();
+
     </script>
 </body>
 </html>
